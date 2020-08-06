@@ -78,6 +78,67 @@ class UsersController < ApplicationController
         render json: users, except: [:created_at, :updated_at]
     end
 
+    def trigger_reset 
+
+        puts "trigger_reset"
+
+        username = params[:username]
+
+        puts username
+
+        user = User.find_by(name: username)
+
+        if user then
+
+            prk = PasswordResetKey.createForUser(username)
+
+            # send email to user with link
+            prk.send_email(user)
+
+            # create key, save record, send email
+            puts "user match to trigger reset"
+            render json: {success: true}
+        else
+            puts "no user match to trigger reset"
+            render json: {success: false}
+        end
+    end
+
+    def password_reset
+        reset_key = params[:key]
+        username = params[:username]
+        password = params[:password]
+
+        puts reset_key
+        puts username
+        puts password
+
+        reset = PasswordResetKey.find_by(username: username, reset_key: reset_key)
+
+        if reset then
+
+            puts "we have a reset key"
+
+            json = {reset: false}
+
+            if reset.expiration > Date.today then
+                reset.destroy
+                user = User.find_by(name: username)
+                user.password = password
+                user.save
+
+                reset.destroy
+
+                token = encode_token(user_id: user.id)
+                json = { id: user.id, name: user.name, jwt: token }
+            end
+
+            render json: json
+        else
+            puts "no reset key found"
+            render json: {reset: false}
+        end
+    end
 
     private
     def user_params

@@ -1,6 +1,9 @@
 
 require 'json';
 
+require 'uri'
+require 'net/http'
+
 class RecipesController < ApplicationController
     # index (based on given user_id)
     # show

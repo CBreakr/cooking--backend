@@ -28,7 +28,10 @@ Rails.application.routes.draw do
   post '/users/login', to: "users#login"
   post '/users/register', to: "users#register"
   post '/users/logout', to: "users#logout"
+  patch '/users/password_reset', to: "users#password_reset"
+  post '/users/trigger_reset', to: "users#trigger_reset"
   get 'users/:id/following', to: "users#following"
+
   get '/followings', to: 'follows#index'
   post '/followings/new', to: "follows#add_follow"
   delete 'followings/:id', to: "follows#destroy"  #here id is the Follow instance id
